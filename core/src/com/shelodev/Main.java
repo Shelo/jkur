@@ -23,7 +23,7 @@ public class Main extends ApplicationAdapter
         puzzleLoader = new PuzzleLoader("levels");
         sceneTools = new SceneTools();
 
-        playScreen = new PlayScreen(puzzleLoader, "levels/2/6.krk");
+        playScreen = new PlayScreen(puzzleLoader, "levels/2/4.krk");
 
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }

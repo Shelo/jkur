@@ -68,6 +68,18 @@ public class PlayInputProcessor implements InputProcessor, ControllerListener
                 cursor.discard();
                 break;
 
+            case Input.Keys.SPACE:
+                cursor.toggleTemporal();
+                break;
+
+            case Input.Keys.ENTER:
+                cursor.applyTemporal();
+                break;
+
+            case Input.Keys.BACKSPACE:
+                cursor.discardTemporal();
+                break;
+
             case Input.Keys.LEFT:
                 cursor.move(-1, 0);
                 break;

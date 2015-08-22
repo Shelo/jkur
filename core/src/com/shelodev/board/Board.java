@@ -307,4 +307,18 @@ public class Board
     {
         return tiles[x][y];
     }
+
+    public void applyTemporal()
+    {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                tiles[x][y].applyTemporal();
+    }
+
+    public void discardTemporal()
+    {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                tiles[x][y].setTemporal(false);
+    }
 }

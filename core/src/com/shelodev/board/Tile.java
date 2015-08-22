@@ -28,6 +28,10 @@ public class Tile
     private boolean fake;
     private float fakeDist;
 
+    // is this a temporal tile.
+    private boolean temporal;
+    private State prevTempState = State.BLANK;
+
     // the fade is controlled with a state machine.
     enum State { BLANK, FILLED, DISCARDED }
     private State prevState = State.BLANK;
@@ -67,18 +71,30 @@ public class Tile
                     break;
             }
 
-            renderer.setColor(color);
+            if (temporal)
+                fakeColor.add(0.2f, 0.2f, 0.2f, 0);
+
+            renderer.setColor(fakeColor);
         }
         else
         {
             if (fake)
             {
                 fakeColor.set(color).mul(1.1f - fakeDist);
+
+                if (temporal)
+                    fakeColor.add(0.2f, 0.2f, 0.2f, 0);
+
                 renderer.setColor(fakeColor);
             }
             else
             {
-                renderer.setColor(color);
+                fakeColor.set(color);
+
+                if (temporal)
+                    fakeColor.add(0.2f, 0.2f, 0.2f, 0);
+
+                renderer.setColor(fakeColor);
             }
         }
 
@@ -95,10 +111,13 @@ public class Tile
             prevColor = prev2;
 
         color.set(prevColor).lerp(target, 1 - timer / FADE_TIME);
+        fakeColor.set(color);
     }
 
-    public void fill()
+    public void fill(boolean temporal)
     {
+        setTemporal(temporal);
+
         if (state != State.FILLED)
         {
             prevState = state;
@@ -112,8 +131,10 @@ public class Tile
         }
     }
 
-    public void discard()
+    public void discard(boolean temporal)
     {
+        setTemporal(temporal);
+
         if (state != State.DISCARDED)
         {
             prevState = state;
@@ -173,5 +194,39 @@ public class Tile
         setFake(fake);
 
         fakeDist = distance * 0.04f;
+    }
+
+    public void setTemporal(boolean temporal)
+    {
+        if (temporal)
+        {
+            prevTempState = state;
+        }
+        else if (this.temporal)
+        {
+            switch (prevTempState)
+            {
+                case BLANK:
+                    color.set(CLEAR_COLOR);
+                    break;
+                case FILLED:
+                    color.set(filledColor);
+                    break;
+                case DISCARDED:
+                    color.set(discardColor);
+                    break;
+            }
+
+            state = prevTempState;
+            prevTempState = state;
+        }
+
+        this.temporal = temporal;
+    }
+
+    public void applyTemporal()
+    {
+        temporal = false;
+        state = prevTempState;
     }
 }

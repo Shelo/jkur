@@ -18,6 +18,7 @@ public class Cursor
     private static final Color POINTER_COLOR    = new Color(1, 1, 1, 0.1f);
     private static final Color CURSOR_COLOR     = new Color(0, 0, 0, 1);
     private static final Color BLINK_TARGET     = new Color(0.75f, 0.25f, 0.25f, 1);
+    private static final Color TEMPORAL_TARGET  = new Color(0.25f, 0.75f, 0.25f, 1);
 
     // to get dimensions on the counter text.
     private GlyphLayout layout = new GlyphLayout();
@@ -36,6 +37,9 @@ public class Cursor
     // discrete positions on the board.
     private int x;
     private int y;
+
+    // place temporal tiles.
+    private boolean temporal;
 
     public Cursor(Board board, int x, int y)
     {
@@ -124,9 +128,14 @@ public class Cursor
     {
         if (toTarget)
         {
-            color.lerp(BLINK_TARGET, 0.05f);
+            Color target = BLINK_TARGET;
 
-            float distance = Math.abs(color.r - BLINK_TARGET.r);
+            if (temporal)
+                target = TEMPORAL_TARGET;
+
+            color.lerp(target, 0.05f);
+
+            float distance = Math.abs(color.r - target.r);
             if (distance <= 0.01f)
                 toTarget = false;
         }
@@ -169,7 +178,7 @@ public class Cursor
     {
         if (board.getTileAt(x, y).isBlank())
         {
-            board.getTileAt(x, y).discard();
+            board.getTileAt(x, y).discard(temporal);
             board.update(x, y);
         }
     }
@@ -178,20 +187,37 @@ public class Cursor
     {
         if (board.getTileAt(x, y).isBlank())
         {
-            board.getTileAt(x, y).fill();
+            board.getTileAt(x, y).fill(temporal);
             board.update(x, y);
         }
     }
 
     public void fill()
     {
-        board.getTileAt(x, y).fill();
+        board.getTileAt(x, y).fill(temporal);
         board.update(x, y);
     }
 
     public void discard()
     {
-        board.getTileAt(x, y).discard();
+        board.getTileAt(x, y).discard(temporal);
         board.update(x, y);
+    }
+
+    public void toggleTemporal()
+    {
+        temporal = !temporal;
+    }
+
+    public void applyTemporal()
+    {
+        temporal = false;
+        board.applyTemporal();
+    }
+
+    public void discardTemporal()
+    {
+        temporal = false;
+        board.discardTemporal();
     }
 }
