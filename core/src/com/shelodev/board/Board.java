@@ -1,0 +1,301 @@
+package com.shelodev.board;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.shelodev.utils.CorrectGroups;
+import com.shelodev.utils.GroupList;
+
+import java.util.*;
+
+public class Board
+{
+    public static final float FAKE_INTERVAL = 5;
+    public static final float FAKE_STAY     = 0.001f;
+    public static final int SECTOR = 5;
+
+    private Tile[][] tiles;
+    private Vector2 size;
+    private int width;
+    private int height;
+    private NumberBoard left;
+    private NumberBoard top;
+
+    private int currentColumn;
+    private float fakeTimer = FAKE_INTERVAL;
+    private float fakeStayTime;
+
+    public Board(int width, int height, NumberBoard left, NumberBoard top)
+    {
+        this.width = width;
+        this.height = height;
+        this.left = left;
+        this.top = top;
+
+        size = new Vector2();
+        tiles = new Tile[width][height];
+
+        buildMatrix();
+        calcSize();
+    }
+
+    private void calcSize()
+    {
+        size.x = Tile.SIZE * (width - 1) + (width - 1) + (width - 1) / SECTOR + Tile.SIZE;
+        size.y = Tile.SIZE * (height - 1) + (height - 1) + (height - 1) / SECTOR + Tile.SIZE;
+    }
+
+    private void buildMatrix()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            int posX = Tile.SIZE * x + x + x / SECTOR;
+
+            for (int y = 0; y < height; y++)
+            {
+                int posY = Tile.SIZE * y + y + y / SECTOR;
+
+                tiles[x][y] = new Tile();
+                tiles[x][y].setPosition(posX, posY);
+            }
+        }
+    }
+
+    public void draw(ShapeRenderer shapeRenderer)
+    {
+        updateFaker();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 1, 1, 1);
+
+        for (int x = 0; x < width; x++)
+        {
+            int column = currentColumn;
+
+            for (int y = 0; y < height; y++)
+            {
+                column--;
+                if (fakeTimer <= 0 && (x == column || x == column - 1 ||
+                        x == column + 1 || x == column - 2 || x == column + 2))
+                    tiles[x][y].setFake(true, Math.abs(column - x));
+                else
+                    tiles[x][y].setFake(false);
+
+                tiles[x][y].draw(shapeRenderer);
+            }
+        }
+
+        shapeRenderer.end();
+    }
+
+    private void updateFaker()
+    {
+        if (fakeTimer <= 0)
+        {
+            if (fakeStayTime <= 0)
+            {
+                currentColumn++;
+
+                if (currentColumn >= width * 2)
+                {
+                    fakeTimer = FAKE_INTERVAL;
+                    currentColumn = 0;
+                }
+
+                fakeStayTime = FAKE_STAY;
+            }
+            else
+            {
+                fakeStayTime -= Gdx.graphics.getDeltaTime();
+            }
+        }
+        else
+        {
+            fakeTimer -= Gdx.graphics.getDeltaTime();
+        }
+    }
+
+    public void update(int column, int row)
+    {
+        updateColumn(column);
+        updateRow(row);
+    }
+
+    private void updateColumn(int column)
+    {
+        ArrayList<Byte> completedIndices = getCompletedIndicesColumn(column);
+
+        int realY = 0;
+        for (int y = 0; y < top.getHeight(); y++)
+        {
+            if (top.getAt(column, y) != -1)
+            {
+                if (completedIndices.contains((byte) realY))
+                    top.setCompleted(column, y);
+                else
+                    top.setNormal(column, y);
+
+                realY++;
+            }
+        }
+    }
+
+    private void updateRow(int row)
+    {
+        ArrayList<Byte> completedIndices = getCompletedIndicesRow(row);
+
+        int realX = 0;
+        for (int x = 0; x < left.getWidth(); x++)
+        {
+            if (left.getAt(x, height - row - 1) != -1)
+            {
+                if (completedIndices.contains((byte) realX))
+                    left.setCompleted(x, height - row - 1);
+                else
+                    left.setNormal(x, height - row - 1);
+
+                realX++;
+            }
+        }
+    }
+
+    private ArrayList<Byte> getCompletedIndicesColumn(int i)
+    {
+        ArrayList<Byte> column = top.getColumn(i);
+        CorrectGroups groups = ultimateColumnGroups(i);
+        return getCompletedIndices(column, groups);
+    }
+
+    private ArrayList<Byte> getCompletedIndicesRow(int i)
+    {
+        ArrayList<Byte> row = left.getRow(height - i - 1);
+        CorrectGroups groups = ultimateRowGroups(i);
+        return getCompletedIndices(row, groups);
+    }
+
+    public ArrayList<Byte> getCompletedIndices(ArrayList<Byte> expectedList, CorrectGroups groups)
+    {
+        byte[] start = groups.getStart();
+        byte[] end = groups.getEnd();
+        byte[] whole = groups.getWhole();
+
+        if (start.length > expectedList.size() || end.length > expectedList.size())
+            return new ArrayList<Byte>();
+
+        if (areEqual(expectedList, whole))
+            return rangeList(expectedList.size());
+
+        ArrayList<Byte> indices = new ArrayList<Byte>();
+        for (byte i = 0; i < start.length; i++)
+        {
+            if (i < expectedList.size())
+            {
+                if (start[i] != expectedList.get(i))
+                    break;
+
+                indices.add(i);
+            }
+        }
+
+        for (byte i = (byte) (end.length - 1); i >= 0; i--)
+        {
+            if (i < expectedList.size())
+            {
+                if (end[i] != expectedList.get(expectedList.size() - end.length + i))
+                    break;
+
+                indices.add((byte) (expectedList.size() - end.length + i));
+            }
+        }
+
+        return indices;
+    }
+
+    private ArrayList<Byte> rangeList(int end)
+    {
+        ArrayList<Byte> result = new ArrayList<Byte>();
+        for (byte i = 0; i < end; i++)
+            result.add(i);
+
+        return result;
+    }
+
+    private boolean areEqual(ArrayList<Byte> first, byte[] second)
+    {
+        if (first.size() != second.length)
+            return false;
+
+        for (int i = 0; i < first.size(); i++)
+            if (first.get(i) != second[i])
+                return false;
+
+        return true;
+    }
+
+    private CorrectGroups ultimateColumnGroups(int x)
+    {
+        GroupList start = findGroups(height - 1, - 1, - 1, false, x, false);
+        GroupList end = findGroups(0, start.getMeta(), 1, false, x, false);
+        GroupList whole = findGroups(height - 1, - 1, - 1, false, x, true);
+        return new CorrectGroups(start.close(), end.reverse(), whole.close());
+    }
+
+    private CorrectGroups ultimateRowGroups(int y)
+    {
+        GroupList start = findGroups(0, width, 1, true, y, false);
+        GroupList end = findGroups(width - 1, start.getMeta(), - 1, true, y, false);
+        GroupList whole = findGroups(0, width, 1, true, y, true);
+        return new CorrectGroups(start.close(), end.reverse(), whole.close());
+    }
+
+    private GroupList findGroups(int start, int end, int acc, boolean row, int i, boolean ignore)
+    {
+        GroupList groups = new GroupList();
+
+        boolean discarding = true;
+        int groupIndex = 0;
+        int startEndIndex = 0;
+        for (int p = start; acc > 0 ? p < end : p > end; p += acc)
+        {
+            Tile tile = tiles[row ? p : i][row ? i : p];
+            startEndIndex = p;
+
+            if (!ignore && tile.isBlank())
+                break;
+
+            if (tile.isFilled())
+            {
+                groups.sum(groupIndex);
+                discarding = false;
+            }
+            else if ((tile.isDiscarded() || (ignore && tile.isBlank())) && !discarding)
+            {
+                discarding = true;
+                groupIndex += 1;
+            }
+        }
+
+        groups.setMeta(startEndIndex);
+        return groups;
+    }
+
+    public Vector2 getSize()
+    {
+        return size;
+    }
+
+    public int getWidth()
+    {
+        return width;
+    }
+
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public Tile getTileAt(int x, int y)
+    {
+        return tiles[x][y];
+    }
+}
