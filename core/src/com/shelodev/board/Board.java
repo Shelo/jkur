@@ -12,18 +12,26 @@ public class Board
 {
     public static final float FAKE_INTERVAL = 5;
     public static final float FAKE_STAY     = 0.001f;
-    public static final int SECTOR = 5;
+    public static final int SECTOR          = 5;
 
+    // matrix of tiles.
     private Tile[][] tiles;
+
+    // dimension in pixels.
     private Vector2 size;
+
+    // discrete dimensions of the board.
     private int width;
     private int height;
+
+    // matrices of numbers.
     private NumberBoard left;
     private NumberBoard top;
 
+    // for the fake highlight effect.
     private int currentColumn;
-    private float fakeTimer = FAKE_INTERVAL;
     private float fakeStayTime;
+    private float fakeTimer = FAKE_INTERVAL;
 
     public Board(int width, int height, NumberBoard left, NumberBoard top)
     {
@@ -74,6 +82,7 @@ public class Board
 
             for (int y = 0; y < height; y++)
             {
+                // update fake effect for the tile.
                 column--;
                 if (fakeTimer <= 0 && (x == column || x == column - 1 ||
                         x == column + 1 || x == column - 2 || x == column + 2))

@@ -1,6 +1,7 @@
 package com.shelodev.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.Vector2;
 import com.shelodev.PuzzleLoader;
 import com.shelodev.SceneTools;
@@ -8,13 +9,18 @@ import com.shelodev.board.*;
 
 public class PlayScreen extends Screen
 {
+    private static final int TOP_OFFSET = 50;
+
     private PlayInputProcessor inputProcessor;
-    private int topOffset = 50;
+
+    // tiles board.
     private Board board;
+
+    // number boards.
     private NumberBoard leftBoard;
     private NumberBoard topBoard;
-    private Cursor cursor;
 
+    private Cursor cursor;
 
     public PlayScreen(PuzzleLoader loader, String puzzlePath)
     {
@@ -25,19 +31,20 @@ public class PlayScreen extends Screen
         topBoard = puzzle.getTop();
 
         cursor = new Cursor(board);
-        cursor.move(0, board.getHeight() - 1);
+        cursor.move(board.getWidth() / 2, board.getHeight() / 2);
 
         inputProcessor = new PlayInputProcessor(cursor);
         Gdx.input.setInputProcessor(inputProcessor);
+        Controllers.addListener(inputProcessor);
     }
 
     @Override
     public void draw(SceneTools tools)
     {
-        inputProcessor.update(cursor);
+        inputProcessor.update();
 
         Vector2 boardSize = board.getSize();
-        tools.setCameraPosition(boardSize.x * 0.5f, boardSize.y * 0.5f + topOffset);
+        tools.setCameraPosition(boardSize.x * 0.5f, boardSize.y * 0.5f + TOP_OFFSET);
 
         // draw the board.
         board.draw(tools.getShapeRenderer());
@@ -47,7 +54,7 @@ public class PlayScreen extends Screen
 
         // draw left board.
         tools.setCameraPosition(boardSize.x / 2 + leftBoard.getWidth() * Tile.SIZE + 10,
-                - boardSize.y / 2 + topOffset);
+                - boardSize.y / 2 + TOP_OFFSET);
 
         tools.getSpriteBatch().begin();
         leftBoard.draw(tools.getSpriteBatch());
@@ -55,7 +62,7 @@ public class PlayScreen extends Screen
 
         // draw top board.
         tools.setCameraPosition(boardSize.x / 2,
-                - boardSize.y / 2 - topBoard.getHeight() * Tile.SIZE - 10 + topOffset);
+                - boardSize.y / 2 - topBoard.getHeight() * Tile.SIZE - 10 + TOP_OFFSET);
 
         tools.getSpriteBatch().begin();
         topBoard.draw(tools.getSpriteBatch());

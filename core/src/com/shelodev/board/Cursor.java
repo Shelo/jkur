@@ -2,6 +2,8 @@ package com.shelodev.board;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -9,18 +11,29 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.shelodev.Res;
+import javafx.scene.control.Control;
 
 public class Cursor
 {
-    private static final Color POINTER_COLOR = new Color(1, 1, 1, 0.1f);
-    private static final Color CURSOR_COLOR = new Color(0, 0, 0, 1);
-    private static final Color BLINK_TARGET = new Color(0.75f, 0.25f, 0.25f, 1);
+    private static final Color POINTER_COLOR    = new Color(1, 1, 1, 0.1f);
+    private static final Color CURSOR_COLOR     = new Color(0, 0, 0, 1);
+    private static final Color BLINK_TARGET     = new Color(0.75f, 0.25f, 0.25f, 1);
 
+    // to get dimensions on the counter text.
     private GlyphLayout layout = new GlyphLayout();
-    private Vector2 countOrigin;
+
+    // origin of the count.
+    private Vector2 countOrigin = new Vector2();
+    private boolean startJoystick;
+
+    // control color changes.
     private boolean toTarget = true;
     private Color color = new Color(CURSOR_COLOR);
+
+    // parent board.
     private Board board;
+
+    // discrete positions on the board.
     private int x;
     private int y;
 
@@ -61,9 +74,35 @@ public class Cursor
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        // draw counter.
-        if (countOrigin != null)
+        // handle counter.
+        boolean count = Gdx.input.isKeyPressed(Input.Keys.C);
+        boolean start = Gdx.input.isKeyJustPressed(Input.Keys.C);
+
+        if (Controllers.getControllers().size > 0)
         {
+            boolean joyCount = Controllers.getControllers().get(0).getButton(4);
+            count |= joyCount;
+
+            if (joyCount)
+            {
+                if (startJoystick)
+                {
+                    startJoystick = false;
+                    start |= true;
+                }
+            }
+            else
+            {
+                startJoystick = true;
+            }
+        }
+
+        // draw counter.
+        if (count)
+        {
+            if (start)
+                countOrigin.set(x, y);
+
             int vx = (int) Math.abs(x - countOrigin.x);
             int vy = (int) Math.abs(y - countOrigin.y);
             String dist;
@@ -89,9 +128,7 @@ public class Cursor
 
             float distance = Math.abs(color.r - BLINK_TARGET.r);
             if (distance <= 0.01f)
-            {
                 toTarget = false;
-            }
         }
         else
         {
@@ -99,28 +136,32 @@ public class Cursor
 
             float distance = Math.abs(color.r - CURSOR_COLOR.r);
             if (distance <= 0.01f)
-            {
                 toTarget = true;
-            }
         }
     }
 
     public void move(int dx, int dy)
     {
         if (x + dx < board.getWidth() && x + dx >= 0)
-        {
             x += dx;
-        }
 
         if (y + dy < board.getWidth() && y + dy >= 0)
-        {
             y += dy;
+
+        boolean zDown = Gdx.input.isKeyPressed(Input.Keys.Z);
+        boolean xDown = Gdx.input.isKeyPressed(Input.Keys.X);
+
+        if (Controllers.getControllers().size > 0)
+        {
+            Controller controller = Controllers.getControllers().get(0);
+            zDown |= controller.getButton(1);
+            xDown |= controller.getButton(2);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.Z))
+        if (zDown)
             fillIfBlank();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.X))
+        if (xDown)
             discardIfBlank();
     }
 
@@ -152,23 +193,5 @@ public class Cursor
     {
         board.getTileAt(x, y).discard();
         board.update(x, y);
-    }
-
-    public void startCount()
-    {
-        countOrigin = new Vector2(x, y);
-    }
-
-    public void endCount()
-    {
-        countOrigin = null;
-    }
-
-    public void toggleCount()
-    {
-        if (countOrigin == null)
-            startCount();
-        else
-            endCount();
     }
 }
