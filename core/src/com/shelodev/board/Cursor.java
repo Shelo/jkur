@@ -119,7 +119,7 @@ public class Cursor
             spriteBatch.begin();
             Res.font.setColor(Color.BLACK);
             layout.setText(Res.font, dist);
-            Res.font.draw(spriteBatch, dist, pixelX + (Tile.SIZE - layout.width) / 2, pixelY + Tile.SIZE - 4);
+            Res.font.draw(spriteBatch, dist, pixelX + (Tile.SIZE - layout.width) / 2, pixelY + 4);
             spriteBatch.end();
         }
     }
