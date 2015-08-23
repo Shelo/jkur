@@ -88,7 +88,7 @@ public class NumberBoard
                     }
 
                     // draws the font with the flipped coordinates.
-                    Res.font.draw(spriteBatch, number, posX + (Tile.SIZE - layout.width) / 2, - posY);
+                    Res.font.draw(spriteBatch, number, posX + (Tile.SIZE - layout.width) / 2, posY);
                 }
             }
         }

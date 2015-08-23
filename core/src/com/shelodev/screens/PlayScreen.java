@@ -9,7 +9,7 @@ import com.shelodev.board.*;
 
 public class PlayScreen extends Screen
 {
-    private static final int TOP_OFFSET = 50;
+    private static final int TOP_OFFSET = - 50;
 
     private PlayInputProcessor inputProcessor;
 
@@ -48,26 +48,24 @@ public class PlayScreen extends Screen
         inputProcessor.update();
 
         Vector2 boardSize = board.getSize();
-        tools.setCameraPosition(boardSize.x * 0.5f, boardSize.y * 0.5f + TOP_OFFSET);
+        float fullWidth = boardSize.x - leftBoard.getWidth() * Tile.SIZE;
+        float fullHeight = boardSize.y - topBoard.getHeight() * Tile.SIZE;
 
         // draw the board.
+        tools.setCameraPosition(fullWidth * 0.5f, fullHeight * 0.5f);
         board.draw(tools.getShapeRenderer());
 
         // draw the cursor.
         cursor.draw(tools.getShapeRenderer(), tools.getSpriteBatch());
 
         // draw left board.
-        tools.setCameraPosition(boardSize.x / 2 + leftBoard.getWidth() * Tile.SIZE + 10,
-                - boardSize.y / 2 + TOP_OFFSET);
-
+        tools.setCameraPosition(fullWidth / 2 + leftBoard.getWidth() * Tile.SIZE + 10, fullHeight / 2);
         tools.getSpriteBatch().begin();
         leftBoard.draw(tools.getSpriteBatch());
         tools.getSpriteBatch().end();
 
         // draw top board.
-        tools.setCameraPosition(boardSize.x / 2,
-                - boardSize.y / 2 - topBoard.getHeight() * Tile.SIZE - 10 + TOP_OFFSET);
-
+        tools.setCameraPosition(fullWidth / 2, fullHeight / 2 + topBoard.getHeight() * Tile.SIZE + 10);
         tools.getSpriteBatch().begin();
         topBoard.draw(tools.getSpriteBatch());
         tools.getSpriteBatch().end();

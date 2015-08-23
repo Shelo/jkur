@@ -154,7 +154,7 @@ public class Cursor
         if (x + dx < board.getWidth() && x + dx >= 0)
             x += dx;
 
-        if (y + dy < board.getWidth() && y + dy >= 0)
+        if (y + dy < board.getHeight() && y + dy >= 0)
             y += dy;
 
         boolean zDown = Gdx.input.isKeyPressed(Input.Keys.Z);

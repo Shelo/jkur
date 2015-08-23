@@ -156,12 +156,12 @@ public class Board
         int realX = 0;
         for (int x = 0; x < left.getWidth(); x++)
         {
-            if (left.getAt(x, height - row - 1) != -1)
+            if (left.getAt(x, row) != -1)
             {
                 if (completedIndices.contains((byte) realX))
-                    left.setCompleted(x, height - row - 1);
+                    left.setCompleted(x, row);
                 else
-                    left.setNormal(x, height - row - 1);
+                    left.setNormal(x, row);
 
                 realX++;
             }
@@ -177,7 +177,7 @@ public class Board
 
     private ArrayList<Byte> getCompletedIndicesRow(int i)
     {
-        ArrayList<Byte> row = left.getRow(height - i - 1);
+        ArrayList<Byte> row = left.getRow(i);
         CorrectGroups groups = ultimateRowGroups(i);
         return getCompletedIndices(row, groups);
     }
@@ -246,9 +246,9 @@ public class Board
 
     private CorrectGroups ultimateColumnGroups(int x)
     {
-        GroupList start = findGroups(height - 1, - 1, - 1, false, x, false);
-        GroupList end = findGroups(0, start.getMeta(), 1, false, x, false);
-        GroupList whole = findGroups(height - 1, - 1, - 1, false, x, true);
+        GroupList start = findGroups(0, height, 1, false, x, false);
+        GroupList end = findGroups(height - 1, start.getMeta(), - 1, false, x, false);
+        GroupList whole = findGroups(0, height, 1, false, x, true);
         return new CorrectGroups(start.close(), end.reverse(), whole.close());
     }
 

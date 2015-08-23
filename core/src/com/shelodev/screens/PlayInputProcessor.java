@@ -89,11 +89,11 @@ public class PlayInputProcessor implements InputProcessor, ControllerListener
                 break;
 
             case Input.Keys.DOWN:
-                cursor.move(0, -1);
+                cursor.move(0, 1);
                 break;
 
             case Input.Keys.UP:
-                cursor.move(0, 1);
+                cursor.move(0, -1);
                 break;
         }
     }

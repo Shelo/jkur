@@ -19,6 +19,8 @@ public class SceneTools
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
+        camera.setToOrtho(true);
+
         spriteBatch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
     }

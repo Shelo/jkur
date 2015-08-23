@@ -9,6 +9,6 @@ public class Res
 
     static
     {
-        font = new BitmapFont(Gdx.files.internal("fonts/numbers14.fnt"));
+        font = new BitmapFont(Gdx.files.internal("fonts/numbers14.fnt"), true);
     }
 }
