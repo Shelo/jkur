@@ -1,25 +1,20 @@
 package com.shelodev.board;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.shelodev.ColorFading;
 import com.shelodev.Settings;
 
 public class Tile
 {
-    public static final int SIZE = 20;
+    public static final Color BLANK_COLOR   = Settings.TILE_BLANK_COLOR;
+    public static final int SIZE            = 20;
 
-    private static final Color CLEAR_COLOR  = Settings.TILE_BLANK_COLOR;
-    private static final float FADE_TIME    = 0.5f;
+    private ColorFading color = new ColorFading(BLANK_COLOR);
+    private Color buffer = new Color();
 
-    // colors of the tile, take into account that for every tile there's a chance that this color varies.
-    private Color filledColor = Settings.TILE_FILL_COLOR.cpy();
-    private Color discardColor = Settings.TILE_DISCARD_COLOR.cpy();
-    private Color fakeColor = new Color();
-    private Color color = new Color(CLEAR_COLOR);
-
-    // timer to control the fadeout/in.
-    private float timer;
+    private float discardDistortion = 1;
+    private float fillDistortion = 1;
 
     // pixel positions on the board.
     private int x;
@@ -33,15 +28,13 @@ public class Tile
     private boolean temporal;
     private State prevTempState = State.BLANK;
 
-    // the fade is controlled with a state machine.
     enum State { BLANK, FILLED, DISCARDED }
-    private State prevState = State.BLANK;
     private State state = State.BLANK;
 
     public Tile()
     {
-        filledColor.mul((float) (Math.random() * 0.2f + 0.8f));
-        discardColor.mul((float) (Math.random() * 0.05f + 1));
+        fillDistortion = (float) (Math.random() * 0.2f + 0.8f);
+        discardDistortion = (float) (Math.random() * 0.05f + 1);
     }
 
     public void setPosition(int x, int y)
@@ -52,67 +45,35 @@ public class Tile
 
     public void draw(ShapeRenderer renderer)
     {
-        if (timer > 0)
-            timer -= Gdx.graphics.getDeltaTime();
+        setColorOnState(state);
+        color.update(0.1f);
 
-        if (timer > 0)
-        {
-            switch (state)
-            {
-                case BLANK:
-                    updateColorIfNotBlank(State.FILLED, filledColor, discardColor, CLEAR_COLOR);
-                    break;
+        buffer.set(color.getColor());
 
-                case FILLED:
-                    updateColorIfNotBlank(State.BLANK, CLEAR_COLOR, discardColor, filledColor);
-                    break;
+        if (fake)
+            buffer.mul(1.1f - fakeDist);
 
-                case DISCARDED:
-                    updateColorIfNotBlank(State.BLANK, CLEAR_COLOR, filledColor, discardColor);
-                    break;
-            }
-
-            if (temporal)
-                fakeColor.add(0.2f, 0.2f, 0.2f, 0);
-
-            renderer.setColor(fakeColor);
-        }
-        else
-        {
-            if (fake)
-            {
-                fakeColor.set(color).mul(1.1f - fakeDist);
-
-                if (temporal)
-                    fakeColor.add(0.2f, 0.2f, 0.2f, 0);
-
-                renderer.setColor(fakeColor);
-            }
-            else
-            {
-                fakeColor.set(color);
-
-                if (temporal)
-                    fakeColor.add(0.2f, 0.2f, 0.2f, 0);
-
-                renderer.setColor(fakeColor);
-            }
-        }
-
+        renderer.setColor(buffer);
         renderer.rect(x, y, SIZE, SIZE);
     }
 
-    private void updateColorIfNotBlank(State conditional, Color prev1, Color prev2, Color target)
+    private void setColorOnState(State state)
     {
-        Color prevColor;
+        switch (state)
+        {
+            case BLANK:
+                color.setTarget(BLANK_COLOR);
+                break;
+            case FILLED:
+                color.setTarget(Settings.TILE_FILL_COLOR, fillDistortion);
+                break;
+            case DISCARDED:
+                color.setTarget(Settings.TILE_DISCARD_COLOR, discardDistortion);
+                break;
+        }
 
-        if (prevState == conditional)
-            prevColor = prev1;
-        else
-            prevColor = prev2;
-
-        color.set(prevColor).lerp(target, 1 - timer / FADE_TIME);
-        fakeColor.set(color);
+        if (temporal)
+            color.addTarget(0.2f, 0.2f, 0.2f, 0);
     }
 
     public void fill(boolean temporal)
@@ -121,44 +82,24 @@ public class Tile
             enableTemporal();
 
         if (state != State.FILLED)
-        {
-            prevState = state;
-            timer = FADE_TIME;
-
             state = State.FILLED;
-        }
         else
-        {
             clear();
-        }
     }
 
     public void discard(boolean temporal)
     {
-        if (temporal)
+        if (temporal && !this.temporal)
             enableTemporal();
 
         if (state != State.DISCARDED)
-        {
-            prevState = state;
-            timer = FADE_TIME;
-
             state = State.DISCARDED;
-        }
         else
-        {
             clear();
-        }
     }
 
     public void clear()
     {
-        if (state != State.BLANK)
-        {
-            prevState = state;
-            timer = FADE_TIME;
-        }
-
         state = State.BLANK;
     }
 
@@ -212,19 +153,6 @@ public class Tile
 
         temporal = false;
         state = prevTempState;
-
-        switch (prevTempState)
-        {
-            case BLANK:
-                color.set(CLEAR_COLOR);
-                break;
-            case FILLED:
-                color.set(filledColor);
-                break;
-            case DISCARDED:
-                color.set(discardColor);
-                break;
-        }
     }
 
     public void applyTemporal()

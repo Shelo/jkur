@@ -37,12 +37,36 @@ public class ColorFading
         ta = color.a;
     }
 
+    public void setTarget(Color color, float m)
+    {
+        tr = color.r * m;
+        tg = color.g * m;
+        tb = color.b * m;
+        ta = color.a * m;
+    }
+
     public void update(float d)
     {
         r += (tr - r) * d;
         g += (tg - g) * d;
         b += (tb - b) * d;
         a += (ta - a) * d;
+    }
+
+    public void mulTarget(float m)
+    {
+        tr *= m;
+        tg *= m;
+        tb *= m;
+        ta *= m;
+    }
+
+    public void addTarget(float r, float g, float b, int a)
+    {
+        tr += r;
+        tg += g;
+        tb += b;
+        ta += a;
     }
 
     public Color getColor()
