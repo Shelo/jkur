@@ -28,10 +28,16 @@ public class Board
     private NumberBoard left;
     private NumberBoard top;
 
+    private boolean[] completedRows;
+    private boolean[] completedColumns;
+
     // for the fake highlight effect.
     private int currentColumn;
     private float fakeStayTime;
     private float fakeTimer = FAKE_INTERVAL;
+
+    // is this the first time we saw a winning puzzle.
+    private boolean firstWin = true;
 
     public Board(int width, int height, NumberBoard left, NumberBoard top)
     {
@@ -39,6 +45,9 @@ public class Board
         this.height = height;
         this.left = left;
         this.top = top;
+
+        completedRows = new boolean[height];
+        completedColumns = new boolean[width];
 
         size = new Vector2();
         tiles = new Tile[width][height];
@@ -78,16 +87,15 @@ public class Board
 
         for (int x = 0; x < width; x++)
         {
-            int column = currentColumn;
-
+            int c = currentColumn;
             for (int y = 0; y < height; y++)
             {
                 // update fake effect for the tile.
-                column--;
-                if (fakeTimer <= 0 && (x == column || x == column - 1 ||
-                        x == column + 1 || x == column - 2 || x == column + 2))
-                    tiles[x][y].setFake(true, Math.abs(column - x));
-                else
+                c--;
+
+                if (fakeTimer <= 0 && (x == c || x == c - 1 || x == c + 1 || x == c - 2 || x == c + 2))
+                    tiles[x][y].setFake(true, Math.abs(c - x));
+                else if (!firstWin)
                     tiles[x][y].setFake(false);
 
                 tiles[x][y].draw(shapeRenderer);
@@ -95,6 +103,11 @@ public class Board
         }
 
         shapeRenderer.end();
+
+        if (isPuzzleCompleted() && firstWin)
+        {
+
+        }
     }
 
     private void updateFaker()
@@ -172,17 +185,17 @@ public class Board
     {
         ArrayList<Byte> column = top.getColumn(i);
         CorrectGroups groups = ultimateColumnGroups(i);
-        return getCompletedIndices(column, groups);
+        return getCompletedIndices(column, groups, false, i);
     }
 
     private ArrayList<Byte> getCompletedIndicesRow(int i)
     {
         ArrayList<Byte> row = left.getRow(i);
         CorrectGroups groups = ultimateRowGroups(i);
-        return getCompletedIndices(row, groups);
+        return getCompletedIndices(row, groups, true, i);
     }
 
-    public ArrayList<Byte> getCompletedIndices(ArrayList<Byte> expectedList, CorrectGroups groups)
+    public ArrayList<Byte> getCompletedIndices(ArrayList<Byte> expectedList, CorrectGroups groups, boolean row, int j)
     {
         byte[] start = groups.getStart();
         byte[] end = groups.getEnd();
@@ -195,7 +208,12 @@ public class Board
             return rangeList(1);
 
         if (areEqual(expectedList, whole))
+        {
+            setComplete(row, j, true);
             return rangeList(expectedList.size());
+        }
+
+        setComplete(row, j, false);
 
         ArrayList<Byte> indices = new ArrayList<Byte>();
         for (byte i = 0; i < start.length; i++)
@@ -221,6 +239,31 @@ public class Board
         }
 
         return indices;
+    }
+
+    private void setComplete(boolean row, int i, boolean completed)
+    {
+        if (row)
+            completedRows[i] = completed;
+        else
+            completedColumns[i] = completed;
+    }
+
+    public boolean isPuzzleCompleted()
+    {
+        for (boolean completedColumn : completedColumns)
+        {
+            if (!completedColumn)
+                return false;
+        }
+
+        for (boolean completedRow : completedRows)
+        {
+            if (!completedRow)
+                return false;
+        }
+
+        return true;
     }
 
     private ArrayList<Byte> rangeList(int end)

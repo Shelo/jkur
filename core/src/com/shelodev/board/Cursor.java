@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.shelodev.ColorFading;
 import com.shelodev.Res;
 
 public class Cursor
@@ -28,7 +29,7 @@ public class Cursor
 
     // control color changes.
     private boolean toTarget = true;
-    private Color color = new Color(CURSOR_COLOR);
+    ColorFading color = new ColorFading(CURSOR_COLOR);
 
     // parent board.
     private Board board;
@@ -61,7 +62,7 @@ public class Cursor
         updateColor();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(color);
+        shapeRenderer.setColor(color.getColor());
         shapeRenderer.rect(pixelX, pixelY, Tile.SIZE, Tile.SIZE);
         shapeRenderer.end();
 
@@ -125,6 +126,8 @@ public class Cursor
 
     public void updateColor()
     {
+        color.update(0.05f);
+
         if (toTarget)
         {
             Color target = BLINK_TARGET;
@@ -132,17 +135,17 @@ public class Cursor
             if (temporal)
                 target = TEMPORAL_TARGET;
 
-            color.lerp(target, 0.05f);
+            color.setTarget(target);
 
-            float distance = Math.abs(color.r - target.r);
+            float distance = Math.abs(color.getColor().r - target.r);
             if (distance <= 0.01f)
                 toTarget = false;
         }
         else
         {
-            color.lerp(CURSOR_COLOR, 0.05f);
+            color.setTarget(CURSOR_COLOR);
 
-            float distance = Math.abs(color.r - CURSOR_COLOR.r);
+            float distance = Math.abs(color.getColor().r - CURSOR_COLOR.r);
             if (distance <= 0.01f)
                 toTarget = true;
         }
