@@ -22,10 +22,8 @@ public class PlayScreen extends Screen
 
     private Cursor cursor;
 
-    public PlayScreen(PuzzleLoader loader, String puzzlePath)
+    public PlayScreen(Puzzle puzzle)
     {
-        Puzzle puzzle = loader.load(puzzlePath);
-
         board = puzzle.getBoard();
         leftBoard = puzzle.getLeft();
         topBoard = puzzle.getTop();
@@ -36,6 +34,12 @@ public class PlayScreen extends Screen
         inputProcessor = new PlayInputProcessor(cursor);
         Gdx.input.setInputProcessor(inputProcessor);
         Controllers.addListener(inputProcessor);
+
+        for (int x = 0; x < board.getWidth(); x++)
+            board.updateColumn(x);
+
+        for (int y = 0; y < board.getHeight(); y++)
+            board.updateRow(y);
     }
 
     @Override

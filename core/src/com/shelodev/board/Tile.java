@@ -3,17 +3,18 @@ package com.shelodev.board;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.shelodev.Settings;
 
 public class Tile
 {
     public static final int SIZE = 20;
 
-    private static final Color CLEAR_COLOR  = new Color(1, 1, 1, 1);
+    private static final Color CLEAR_COLOR  = Settings.TILE_BLANK_COLOR;
     private static final float FADE_TIME    = 0.5f;
 
     // colors of the tile, take into account that for every tile there's a chance that this color varies.
-    private Color filledColor = new Color(0.15234375f, 0.4453125f, 0.69140625f, 1);
-    private Color discardColor = new Color(0.2f, 0.2f, 0.2f, 1);
+    private Color filledColor = Settings.TILE_FILL_COLOR.cpy();
+    private Color discardColor = Settings.TILE_DISCARD_COLOR.cpy();
     private Color fakeColor = new Color();
     private Color color = new Color(CLEAR_COLOR);
 
@@ -116,7 +117,8 @@ public class Tile
 
     public void fill(boolean temporal)
     {
-        setTemporal(temporal);
+        if (temporal && !this.temporal)
+            enableTemporal();
 
         if (state != State.FILLED)
         {
@@ -133,7 +135,8 @@ public class Tile
 
     public void discard(boolean temporal)
     {
-        setTemporal(temporal);
+        if (temporal)
+            enableTemporal();
 
         if (state != State.DISCARDED)
         {
@@ -196,37 +199,40 @@ public class Tile
         fakeDist = distance * 0.04f;
     }
 
-    public void setTemporal(boolean temporal)
+    public void enableTemporal()
     {
-        if (temporal)
-        {
-            prevTempState = state;
-        }
-        else if (this.temporal)
-        {
-            switch (prevTempState)
-            {
-                case BLANK:
-                    color.set(CLEAR_COLOR);
-                    break;
-                case FILLED:
-                    color.set(filledColor);
-                    break;
-                case DISCARDED:
-                    color.set(discardColor);
-                    break;
-            }
+        prevTempState = state;
+        temporal = true;
+    }
 
-            state = prevTempState;
-            prevTempState = state;
-        }
+    public void discardTemporal()
+    {
+        if (!temporal)
+            return;
 
-        this.temporal = temporal;
+        temporal = false;
+        state = prevTempState;
+
+        switch (prevTempState)
+        {
+            case BLANK:
+                color.set(CLEAR_COLOR);
+                break;
+            case FILLED:
+                color.set(filledColor);
+                break;
+            case DISCARDED:
+                color.set(discardColor);
+                break;
+        }
     }
 
     public void applyTemporal()
     {
+        if (!temporal)
+            return;
+
         temporal = false;
-        state = prevTempState;
+        prevTempState = state;
     }
 }

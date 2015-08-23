@@ -11,7 +11,6 @@ public class Main extends ApplicationAdapter
 {
     private PlayScreen playScreen;
     private SceneTools sceneTools;
-    private Color backgroundColor;
     private PuzzleLoader puzzleLoader;
 
     @Override
@@ -19,11 +18,10 @@ public class Main extends ApplicationAdapter
     {
         Gdx.gl.glClearColor(0, 0, 0, 1);
 
-        backgroundColor = new Color(0.076171875f, 0.22265625f, 0.34570312f, 1);
         puzzleLoader = new PuzzleLoader("levels");
         sceneTools = new SceneTools();
 
-        playScreen = new PlayScreen(puzzleLoader, "levels/2/4.krk");
+        playScreen = new PlayScreen(puzzleLoader.load("levels/2/1.krk"));
 
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -36,7 +34,7 @@ public class Main extends ApplicationAdapter
         sceneTools.resetCameraPosition();
 
         sceneTools.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        sceneTools.getShapeRenderer().setColor(backgroundColor);
+        sceneTools.getShapeRenderer().setColor(Settings.BACKGROUND_COLOR);
         sceneTools.getShapeRenderer().rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sceneTools.getShapeRenderer().end();
 

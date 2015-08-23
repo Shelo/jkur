@@ -130,7 +130,7 @@ public class Board
         updateRow(row);
     }
 
-    private void updateColumn(int column)
+    public void updateColumn(int column)
     {
         ArrayList<Byte> completedIndices = getCompletedIndicesColumn(column);
 
@@ -149,7 +149,7 @@ public class Board
         }
     }
 
-    private void updateRow(int row)
+    public void updateRow(int row)
     {
         ArrayList<Byte> completedIndices = getCompletedIndicesRow(row);
 
@@ -190,6 +190,9 @@ public class Board
 
         if (start.length > expectedList.size() || end.length > expectedList.size())
             return new ArrayList<Byte>();
+
+        if (expectedList.get(0) == 0 && whole.length == 0)
+            return rangeList(1);
 
         if (areEqual(expectedList, whole))
             return rangeList(expectedList.size());
@@ -319,6 +322,12 @@ public class Board
     {
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
-                tiles[x][y].setTemporal(false);
+                tiles[x][y].discardTemporal();
+
+        for (int x = 0; x < width; x++)
+            updateColumn(x);
+
+        for (int y = 0; y < height; y++)
+            updateRow(y);
     }
 }
