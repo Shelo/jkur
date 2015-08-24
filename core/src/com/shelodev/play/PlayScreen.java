@@ -1,16 +1,14 @@
-package com.shelodev.playscreen;
+package com.shelodev.play;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.Vector2;
 import com.shelodev.utils.SceneTools;
-import com.shelodev.playscreen.board.*;
+import com.shelodev.play.board.*;
 import com.shelodev.Screen;
 
 public class PlayScreen extends Screen
 {
-    private static final int TOP_OFFSET = - 50;
-
     private PlayInputProcessor inputProcessor;
 
     // tiles board.
@@ -69,5 +67,17 @@ public class PlayScreen extends Screen
         tools.getSpriteBatch().begin();
         topBoard.draw(tools.getSpriteBatch());
         tools.getSpriteBatch().end();
+    }
+
+    @Override
+    public void exit()
+    {
+
+    }
+
+    @Override
+    public void enter()
+    {
+
     }
 }

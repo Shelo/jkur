@@ -1,4 +1,4 @@
-package com.shelodev.playscreen;
+package com.shelodev.play;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
-import com.shelodev.playscreen.board.Cursor;
+import com.shelodev.play.board.Cursor;
 
 import java.util.HashSet;
 

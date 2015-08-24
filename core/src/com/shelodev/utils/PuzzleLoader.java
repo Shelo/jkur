@@ -2,9 +2,9 @@ package com.shelodev.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.shelodev.playscreen.board.Board;
-import com.shelodev.playscreen.board.NumberBoard;
-import com.shelodev.playscreen.board.Puzzle;
+import com.shelodev.play.board.Board;
+import com.shelodev.play.board.NumberBoard;
+import com.shelodev.play.board.Puzzle;
 
 import java.io.*;
 import java.util.ArrayList;

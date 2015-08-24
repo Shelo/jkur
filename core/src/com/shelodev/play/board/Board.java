@@ -1,4 +1,4 @@
-package com.shelodev.playscreen.board;
+package com.shelodev.play.board;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;

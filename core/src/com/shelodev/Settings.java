@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Settings
 {
+    public static final int SCREEN_WIDTH            = 800;
+    public static final int SCREEN_HEIGHT           = 600;
+
     public static final Color TILE_BLANK_COLOR      = Color.WHITE;
     public static final Color TILE_FILL_COLOR       = new Color(0.15234375f, 0.4453125f, 0.69140625f, 1);
     public static final Color TILE_DISCARD_COLOR    = new Color(0.2f, 0.2f, 0.2f, 1);
