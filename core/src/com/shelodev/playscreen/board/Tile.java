@@ -1,8 +1,8 @@
-package com.shelodev.board;
+package com.shelodev.playscreen.board;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.shelodev.ColorFading;
+import com.shelodev.utils.ColorFading;
 import com.shelodev.Settings;
 
 public class Tile
@@ -15,6 +15,7 @@ public class Tile
 
     private float discardDistortion = 1;
     private float fillDistortion = 1;
+    private float colorMul = 1;
 
     // pixel positions on the board.
     private int x;
@@ -74,6 +75,8 @@ public class Tile
 
         if (temporal)
             color.addTarget(0.2f, 0.2f, 0.2f, 0);
+
+        color.mulTarget(colorMul);
     }
 
     public void fill(boolean temporal)
@@ -162,5 +165,15 @@ public class Tile
 
         temporal = false;
         prevTempState = state;
+    }
+
+    public ColorFading getColor()
+    {
+        return color;
+    }
+
+    public void setColorMul(float colorMul)
+    {
+        this.colorMul = colorMul;
     }
 }

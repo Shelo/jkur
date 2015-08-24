@@ -1,4 +1,4 @@
-package com.shelodev.board;
+package com.shelodev.playscreen.board;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -95,7 +95,7 @@ public class Board
 
                 if (fakeTimer <= 0 && (x == c || x == c - 1 || x == c + 1 || x == c - 2 || x == c + 2))
                     tiles[x][y].setFake(true, Math.abs(c - x));
-                else if (!firstWin)
+                else
                     tiles[x][y].setFake(false);
 
                 tiles[x][y].draw(shapeRenderer);
@@ -106,7 +106,12 @@ public class Board
 
         if (isPuzzleCompleted() && firstWin)
         {
+            fakeTimer = 0;
+            currentColumn = 0;
+            fakeStayTime = 0;
+            firstWin = false;
 
+            System.out.println("Puzzle completed!");
         }
     }
 

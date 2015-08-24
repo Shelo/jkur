@@ -1,11 +1,11 @@
-package com.shelodev.screens;
+package com.shelodev.playscreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.Vector2;
-import com.shelodev.PuzzleLoader;
-import com.shelodev.SceneTools;
-import com.shelodev.board.*;
+import com.shelodev.utils.SceneTools;
+import com.shelodev.playscreen.board.*;
+import com.shelodev.Screen;
 
 public class PlayScreen extends Screen
 {

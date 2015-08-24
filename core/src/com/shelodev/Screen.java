@@ -1,6 +1,6 @@
-package com.shelodev.screens;
+package com.shelodev;
 
-import com.shelodev.SceneTools;
+import com.shelodev.utils.SceneTools;
 
 public abstract class Screen
 {

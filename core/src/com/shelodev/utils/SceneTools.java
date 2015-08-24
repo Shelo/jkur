@@ -1,4 +1,4 @@
-package com.shelodev;
+package com.shelodev.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;

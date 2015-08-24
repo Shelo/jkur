@@ -1,14 +1,13 @@
-package com.shelodev;
+package com.shelodev.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.shelodev.board.Board;
-import com.shelodev.board.NumberBoard;
-import com.shelodev.board.Puzzle;
+import com.shelodev.playscreen.board.Board;
+import com.shelodev.playscreen.board.NumberBoard;
+import com.shelodev.playscreen.board.Puzzle;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
 
 public class PuzzleLoader
 {

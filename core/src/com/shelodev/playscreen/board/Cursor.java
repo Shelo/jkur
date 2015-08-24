@@ -1,4 +1,4 @@
-package com.shelodev.board;
+package com.shelodev.playscreen.board;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.shelodev.ColorFading;
+import com.shelodev.utils.ColorFading;
 import com.shelodev.Res;
 
 public class Cursor

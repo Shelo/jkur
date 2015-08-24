@@ -1,4 +1,4 @@
-package com.shelodev.board;
+package com.shelodev.playscreen.board;
 
 public class Puzzle
 {
